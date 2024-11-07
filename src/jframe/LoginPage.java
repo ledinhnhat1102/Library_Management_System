@@ -16,53 +16,19 @@ import javax.swing.JOptionPane;
  *
  * @author Legion
  */
-public class SigupPage extends javax.swing.JFrame {
+public class LoginPage extends javax.swing.JFrame {
 
     /**
      * Creates new form SigupPage
      */
-    public SigupPage() {
+    public LoginPage() {
         initComponents();
     }
     
-    public void insertSingupDetail() {
+ //validation
+    public boolean validateLogin(){
         String name = txt_username.getText();
         String pwd = txt_password.getText();
-        String email = txt_email.getText();
-        String contact = txt_contact.getText();
-        try {
-            Connection con = DBConnection.getConnection();
-            String sql = "INSERT INTO users(name, password, email, contact) VALUES (?, ?, ?, ?)";
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, name);
-            pst.setString(2, pwd);
-            pst.setString(3, email);
-            pst.setString(4, contact);
-            
-            int rowCount = pst.executeUpdate();
-            if (rowCount > 0) {
-                JOptionPane.showMessageDialog(this, "Sign-up details inserted successfully.");
-                
-                txt_username.setText("");
-                txt_password.setText("");
-                txt_email.setText("");
-                txt_contact.setText("");
-            } else {
-                JOptionPane.showMessageDialog(this, "Error inserting sign-up details.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // Bạn có thể thêm thông báo lỗi rõ ràng hơn
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        }
-    }
-    
-    //validation
-    public  boolean validateSignup(){
-        String name = txt_username.getText();
-        String pwd = txt_password.getText();
-        String email = txt_email.getText();
-        String contact = txt_contact.getText();
-        
         if(name.equals("")){
             JOptionPane.showMessageDialog(this, "please enter username");
             return false;
@@ -71,37 +37,37 @@ public class SigupPage extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "please enter password");
             return false;
         }
-        if(email.equals("")){
-            JOptionPane.showMessageDialog(this, "please enter email");
-            return false;
-        }
-        if(contact.equals("")){
-            JOptionPane.showMessageDialog(this, "please enter contact");
-            return false;
-        }
         return true;
     }
     
-    //check duplicate user
-    public  boolean checkDuplicateUser(){
+    public void login(){
         String name = txt_username.getText();
-        boolean isExits=false;
+        String pwd = txt_password.getText();
         try{
             Class.forName("com.mysql.jdbc.Driver");
-             Connection con =java.sql.DriverManager.getConnection("jdbc:mysql://localhost:3306/library_ms","root","");
-             PreparedStatement pst =con.prepareStatement("select * from users where name = ?");
-             pst.setString(WIDTH, name);
-             ResultSet rs =pst.executeQuery();
-             if(rs.next()){
-                 isExits=true;
-             }else{
-                 isExits=false;
-             }
+            Connection con =java.sql.DriverManager.getConnection("jdbc:mysql://localhost:3306/library_ms","root","");
+            PreparedStatement pst = con.prepareStatement("select * from users where name = ? and password =? ");
+            
+            pst.setString(1, name);
+            pst.setString(2, pwd);
+            
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                JOptionPane.showConfirmDialog(this, "login successful");
+                HomePage home = new HomePage();
+                home.setVisible(true);
+                this.dispose();
+            }else{
+                JOptionPane.showMessageDialog(this, "incorrect username or password");
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
-        return isExits;
     }
+ 
+    
+    //check duplicate user
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -129,12 +95,6 @@ public class SigupPage extends javax.swing.JFrame {
         txt_password = new app.bolivia.swing.JCTextField();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        txt_email = new app.bolivia.swing.JCTextField();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        txt_contact = new app.bolivia.swing.JCTextField();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
         rSMaterialButtonCircle1 = new rojerusan.RSMaterialButtonCircle();
         rSMaterialButtonCircle2 = new rojerusan.RSMaterialButtonCircle();
 
@@ -170,7 +130,7 @@ public class SigupPage extends javax.swing.JFrame {
         jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 190, -1, -1));
         jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 230, -1, -1));
 
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/signup-library-icon.png"))); // NOI18N
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/library-3.png.png"))); // NOI18N
         jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, -30, 720, 860));
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 770));
@@ -181,13 +141,13 @@ public class SigupPage extends javax.swing.JFrame {
 
         jLabel9.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Signup Page");
+        jLabel9.setText("Login Page");
         jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, 200, 50));
 
         jLabel10.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel10.setText("Create New Account Here");
-        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 130, 230, 20));
+        jLabel10.setText("Welcome, Login To your Account");
+        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 120, 270, 20));
 
         txt_username.setBackground(new java.awt.Color(102, 102, 225));
         txt_username.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
@@ -236,48 +196,6 @@ public class SigupPage extends javax.swing.JFrame {
         jLabel17.setText("Password");
         jPanel3.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 260, 210, 30));
 
-        txt_email.setBackground(new java.awt.Color(102, 102, 225));
-        txt_email.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
-        txt_email.setPlaceholder("Enter Email....");
-        txt_email.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_emailActionPerformed(evt);
-            }
-        });
-        jPanel3.add(txt_email, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, 260, 40));
-
-        jLabel18.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel18.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/icons8_Secured_Letter_50px.png"))); // NOI18N
-        jLabel18.setRequestFocusEnabled(false);
-        jPanel3.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 390, 50, 50));
-
-        jLabel19.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
-        jLabel19.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel19.setText("Email");
-        jPanel3.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 360, 210, 30));
-
-        txt_contact.setBackground(new java.awt.Color(102, 102, 225));
-        txt_contact.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 0, 0)));
-        txt_contact.setPlaceholder("Enter Contact....");
-        txt_contact.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_contactActionPerformed(evt);
-            }
-        });
-        jPanel3.add(txt_contact, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 510, 260, 40));
-
-        jLabel20.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/icons8_Google_Mobile_50px.png"))); // NOI18N
-        jLabel20.setRequestFocusEnabled(false);
-        jPanel3.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 500, 50, 50));
-
-        jLabel21.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
-        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel21.setText("Contact");
-        jPanel3.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 470, 210, 30));
-
         rSMaterialButtonCircle1.setBackground(new java.awt.Color(51, 51, 255));
         rSMaterialButtonCircle1.setText("Login");
         rSMaterialButtonCircle1.addActionListener(new java.awt.event.ActionListener() {
@@ -285,7 +203,7 @@ public class SigupPage extends javax.swing.JFrame {
                 rSMaterialButtonCircle1ActionPerformed(evt);
             }
         });
-        jPanel3.add(rSMaterialButtonCircle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 640, 190, 50));
+        jPanel3.add(rSMaterialButtonCircle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 380, 190, 50));
 
         rSMaterialButtonCircle2.setBackground(new java.awt.Color(255, 51, 51));
         rSMaterialButtonCircle2.setText("SignUp");
@@ -299,7 +217,7 @@ public class SigupPage extends javax.swing.JFrame {
                 rSMaterialButtonCircle2ActionPerformed(evt);
             }
         });
-        jPanel3.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 580, 190, 50));
+        jPanel3.add(rSMaterialButtonCircle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 450, 180, 50));
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 0, 400, 780));
 
@@ -315,40 +233,26 @@ public class SigupPage extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_passwordActionPerformed
 
-    private void txt_emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_emailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_emailActionPerformed
-
-    private void txt_contactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_contactActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_contactActionPerformed
-
     private void rSMaterialButtonCircle1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle1ActionPerformed
-        LoginPage loginPage = new LoginPage(); // Giả sử tên form đăng nhập là LoginForm
-        loginPage.setVisible(true);
-         // Đóng hoặc ẩn form hiện tại (form đăng ký)
-        this.dispose(); 
+        if(validateLogin()){
+            login();
+        }
     }//GEN-LAST:event_rSMaterialButtonCircle1ActionPerformed
 
+    private void txt_usernameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_usernameFocusLost
+      
+    }//GEN-LAST:event_txt_usernameFocusLost
+
     private void rSMaterialButtonCircle2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2ActionPerformed
-        if(validateSignup()==true){
-            if(checkDuplicateUser()==false){
-                insertSingupDetail();
-            }else{
-                JOptionPane.showMessageDialog(this, "username already exist");
-            }
-        }
+        SigupPage sigupPage = new SigupPage(); // Giả sử tên form đăng nhập là LoginForm
+        sigupPage.setVisible(true);
+         // Đóng hoặc ẩn form hiện tại (form đăng ký)
+        this.dispose();
     }//GEN-LAST:event_rSMaterialButtonCircle2ActionPerformed
 
     private void rSMaterialButtonCircle2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle2FocusLost
-        
-    }//GEN-LAST:event_rSMaterialButtonCircle2FocusLost
 
-    private void txt_usernameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_usernameFocusLost
-        if(checkDuplicateUser()==true){
-            JOptionPane.showMessageDialog(this, "username already exist");
-        }
-    }//GEN-LAST:event_txt_usernameFocusLost
+    }//GEN-LAST:event_rSMaterialButtonCircle2FocusLost
 
     /**
      * @param args the command line arguments
@@ -367,20 +271,21 @@ public class SigupPage extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SigupPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SigupPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SigupPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SigupPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SigupPage().setVisible(true);
+                new LoginPage().setVisible(true);
             }
         });
     }
@@ -392,11 +297,7 @@ public class SigupPage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -408,8 +309,6 @@ public class SigupPage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle1;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle2;
-    private app.bolivia.swing.JCTextField txt_contact;
-    private app.bolivia.swing.JCTextField txt_email;
     private app.bolivia.swing.JCTextField txt_password;
     private app.bolivia.swing.JCTextField txt_username;
     // End of variables declaration//GEN-END:variables
