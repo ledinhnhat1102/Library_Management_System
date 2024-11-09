@@ -120,7 +120,7 @@ public class ManageBooks extends javax.swing.JFrame {
                 isDeleted = false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); //cập nhật
         }
         return isDeleted;
     }
