@@ -4,10 +4,14 @@
  */
 package jframe;
 
-import com.sun.jdi.connect.spi.Connection;
-import java.beans.Statement;
+import java.sql.Connection;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import javax.swing.table.TableModel;
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -31,10 +35,10 @@ public class ManageBooks extends javax.swing.JFrame {
             ResultSet rs = st.executeQuery("select * from book_details");
             
             while(rs.next()){
-                String bookId = rs.getString("book_id");
+                int bookId = rs.getInt("book_id");
                 String bookName = rs.getString("book_name");
                 String author = rs.getString("author");
-                String quantity = rs.getString("quantity");
+                int quantity = rs.getInt("quantity");
                 
                 Object[] obj = {bookId,bookName,author,quantity};
                 model = (DefaultTableModel) tbl_bookDetails.getModel();
@@ -53,13 +57,13 @@ public class ManageBooks extends javax.swing.JFrame {
         quantity = Integer.parseInt(txt_quantity.getText());
         
         try {
-            Connection con DBConnection.getConnection();
-            String sql = "insert into book details values(?,?,?,?)";
+            Connection con = DBConnection.getConnection();
+            String sql = "insert into book_details values(?,?,?,?)";
             PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, bookId);
+            pst.setInt(1, bookId);
             pst.setString(2, bookName);
             pst.setString(3, author);
-            pst.setString(4, quantity);
+            pst.setInt(4, quantity);
             
             int rowCount = pst.executeUpdate();
             if (rowCount > 0) {
@@ -79,7 +83,7 @@ public class ManageBooks extends javax.swing.JFrame {
         quantity = Integer.parseInt(txt_quantity.getText());
         
         try {
-            Connection con DBConnection.getConnection();
+            Connection con = DBConnection.getConnection();
             String sql = "update book_details set book_name = ?,author = ?,quantity = ? where book_id = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, bookName);
@@ -104,7 +108,7 @@ public class ManageBooks extends javax.swing.JFrame {
         bookId = Integer.parseInt(txt_bookId.getText());
         
         try {
-            Connection con DBConnection.getConnection();
+            Connection con = DBConnection.getConnection();
             String sql = "delete from book_details where book_id = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, bookId);
@@ -119,6 +123,32 @@ public class ManageBooks extends javax.swing.JFrame {
             e.printStackTrace();
         }
         return isDeleted;
+    }
+    
+    public void searchBook(String searchText) {
+    clearTable();
+    try {
+        Connection con = DBConnection.getConnection();
+        String sql = "SELECT * FROM book_details WHERE book_name LIKE ? OR author LIKE ?";
+        PreparedStatement pst = con.prepareStatement(sql);
+        pst.setString(1, "%" + searchText + "%");
+        pst.setString(2, "%" + searchText + "%");
+
+        ResultSet rs = pst.executeQuery();
+        
+        while (rs.next()) {
+            int bookId = rs.getInt("book_id");
+            String bookName = rs.getString("book_name");
+            String author = rs.getString("author");
+            int quantity = rs.getInt("quantity");
+
+            Object[] obj = {bookId, bookName, author, quantity};
+            model = (DefaultTableModel) tbl_bookDetails.getModel();
+            model.addRow(obj);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
     }
     
     public void clearTable() {
@@ -160,6 +190,9 @@ public class ManageBooks extends javax.swing.JFrame {
         tbl_bookDetails = new rojeru_san.complementos.RSTableMetro();
         jLabel11 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        txt_search = new app.bolivia.swing.JCTextField();
+        rSMaterialButtonCircle4 = new rojerusan.RSMaterialButtonCircle();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -303,10 +336,10 @@ public class ManageBooks extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(50, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(45, 45, 45)
                 .addComponent(jLabel10)
-                .addGap(43, 43, 43))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -316,7 +349,7 @@ public class ManageBooks extends javax.swing.JFrame {
                 .addContainerGap(10, Short.MAX_VALUE))
         );
 
-        jPanel3.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 0, 120, 60));
+        jPanel3.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(970, 0, 120, 60));
 
         tbl_bookDetails.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -337,13 +370,13 @@ public class ManageBooks extends javax.swing.JFrame {
             tbl_bookDetails.getColumnModel().getColumn(3).setResizable(false);
         }
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 220, 610, 310));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 270, 610, 310));
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 102, 0));
         jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/AddNewBookIcons/icons8_Books_52px_1.png"))); // NOI18N
         jLabel11.setText("  Management Books");
-        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 70, 350, -1));
+        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 70, 350, -1));
 
         jPanel5.setBackground(new java.awt.Color(255, 102, 51));
 
@@ -358,9 +391,25 @@ public class ManageBooks extends javax.swing.JFrame {
             .addGap(0, 5, Short.MAX_VALUE)
         );
 
-        jPanel3.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 130, 440, 5));
+        jPanel3.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 130, 440, 5));
 
-        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 0, 1000, 820));
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
+        jLabel12.setText("Tìm kếm:");
+        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 190, -1, -1));
+
+        txt_search.setText("Nhập tên sách hoặc tên tác giả");
+        jPanel3.add(txt_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 190, 290, -1));
+
+        rSMaterialButtonCircle4.setBackground(new java.awt.Color(255, 102, 51));
+        rSMaterialButtonCircle4.setText("Tìm kiếm");
+        rSMaterialButtonCircle4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rSMaterialButtonCircle4ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(rSMaterialButtonCircle4, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 180, 100, 50));
+
+        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 0, 1090, 820));
 
         setSize(new java.awt.Dimension(1740, 832));
         setLocationRelativeTo(null);
@@ -429,6 +478,11 @@ public class ManageBooks extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_rSMaterialButtonCircle2ActionPerformed
 
+    private void rSMaterialButtonCircle4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSMaterialButtonCircle4ActionPerformed
+        String searchText = txt_search.getText();
+        searchBook(searchText);
+    }//GEN-LAST:event_rSMaterialButtonCircle4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -468,6 +522,7 @@ public class ManageBooks extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -485,10 +540,12 @@ public class ManageBooks extends javax.swing.JFrame {
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle1;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle2;
     private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle3;
+    private rojerusan.RSMaterialButtonCircle rSMaterialButtonCircle4;
     private rojeru_san.complementos.RSTableMetro tbl_bookDetails;
     private app.bolivia.swing.JCTextField txt_authorName;
     private app.bolivia.swing.JCTextField txt_bookId;
     private app.bolivia.swing.JCTextField txt_bookName;
     private app.bolivia.swing.JCTextField txt_quantity;
+    private app.bolivia.swing.JCTextField txt_search;
     // End of variables declaration//GEN-END:variables
 }
